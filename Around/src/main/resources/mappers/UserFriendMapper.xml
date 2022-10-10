@@ -1,0 +1,46 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.UserFriendDao">
+
+	<select id="friendList" resultMap="userFriendDetail" parameterType="int">
+		select list_no, friend_no, statue, f.user_no, alarm, user_name, nickname
+		from user_friend f join users u
+		on friend_no = u.user_no
+		where f.user_no=#{userNo}
+	</select>
+	<update id="updateAlarm" parameterType="hashmap">
+		update user_friend set alarm=#{alarm} where friend_no=#{friendNo} and user_no=#{userNo}
+	</update>
+	
+	<select id="selectAlarm" parameterType="map" resultType="String">
+		select alarm
+		from user_friend
+		where friend_no=#{friendNo} and user_no=#{userNo}
+	</select>
+	
+	<delete id="deleteFriend" parameterType="int">
+		delete from user_friend where friend_no=#{friendNo}
+	</delete>
+	
+	<insert id="insertFriend" parameterType="userFriend">
+		insert into user_friend 
+		values(friend_list_no_seq.nextval, #{friendNo}, #{statue}, #{userNo}, #{alarm})
+	</insert>
+	
+	<resultMap type="userfriend" id="userFriendBase">
+		<id column="list_no" property="listNo" />
+		<result column="friend_no" property="friendNo" />
+		<result column="statue" property="statue" />
+		<result column="user_no" property="userNo" />
+		<result column="alarm" property="alarm" />
+		<result column="user_name" property="userName" />
+		<result column="nickname" property="nickname" />
+	</resultMap>
+	
+	<resultMap type="userfriend" id="userFriendDetail" extends="userFriendBase">
+		<collection property="usersSet" ofType="user" resultMap="UserMapper.usersBase"></collection>
+	</resultMap>
+
+</mapper>

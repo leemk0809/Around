@@ -1,0 +1,32 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.HotBoardDao">
+	
+	<select id="selectHotBoardByCategory" resultMap="hotBoardBase" parameterType="int">
+		select *
+		from hot_board
+		where category_no=#{categoryNo}		
+	</select>
+	
+	<select id="selectAllHotBoard" resultMap="hotBoardBase">
+		select *
+		from hot_board
+	</select>
+			
+	
+	<insert id="insertHotBoard">
+		insert into hot_board values(hot_board_no_seq.nextval,#{categoryNo},#{title},#{contents},#{filePath})
+	</insert>
+	
+	
+	<resultMap type="hotBoard" id="hotBoardBase">
+		<id column="hot_board_no" property="hotBoardNo"/>
+		<result column="category_no" property="categoryNo"/>
+		<result column="title" property="title"/>
+		<result column="contents" property="contents"/>
+		<result column="file_path" property="filePath"/>		
+	</resultMap>
+
+</mapper>

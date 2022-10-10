@@ -1,0 +1,17 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.UserHistoryDao">	
+	
+	<insert id="insertUserHistory" parameterType="userHistory">
+		insert into USER_HISTORY
+		values(#{userNo},#{boardNo})
+	</insert>	
+	
+	<resultMap type="userHistory" id="userHistoryBase">
+		<id column="user_no" property="userNo"/>
+		<result column="board_no" property="boardNo"/>		
+	</resultMap>
+
+</mapper>

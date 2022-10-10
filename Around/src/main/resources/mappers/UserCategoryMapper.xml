@@ -1,0 +1,42 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.UserCategoryDao">
+	
+	<select id="selectAllUserCategory" resultMap="userCategoryBase">
+		select *
+		from USER_CATEGORY
+	</select>
+	
+	<select id="selectUserCategory" resultMap="usercategoryDetail" parameterType="int">
+		select c.CATEGORY_NO ,c.CATEGORY_NAME 
+		from USER_CATEGORY u, CATEGORY c 
+		where u.category_no = c.category_no and user_no = #{id}
+	</select>
+	
+		
+	
+	<insert id="insertUserCategory" parameterType="usercategory">
+		insert into USER_CATEGORY
+		values(category_list_no_seq.NEXTVAL,#{categoryNo},#{userNo})
+	</insert>
+	
+	<delete id="deleteUserCategory" parameterType="usercategory">
+		delete USER_CATEGORY
+		where USER_NO = #{userNo} and category_no =#{categoryNo}	
+	</delete>
+	
+	
+	<resultMap type="usercategory" id="userCategoryBase">
+		<id column="list_no" property="listNo"/>
+		<result column="category_no" property="categoryNo"/>
+		<result column="user_no" property="userNo"/>		
+	</resultMap>
+	
+	<resultMap type="usercategory" id="usercategoryDetail" extends="userCategoryBase">
+		<association property="category" column="category_no" javaType="category" resultMap="CategoryMapper.categoryBase"></association>
+	</resultMap>
+	
+
+</mapper>

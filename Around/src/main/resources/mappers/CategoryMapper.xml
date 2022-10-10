@@ -1,0 +1,53 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.CategoryDao">
+	
+	<select id="selectAllCategory" resultMap="categoryBase">
+		select *
+		from category
+		order by CATEGORY_NO
+	</select>
+	
+	<select id="selectAllCategoryByUser" resultMap="categoryBase" parameterType="int">
+		select *
+		from category
+		where CATEGORY_NO not in (select CATEGORY_NO from USER_CATEGORY where user_no = #{userNo})
+		order by CATEGORY_NO
+	</select>
+	
+	
+	<select id="selectAllCategoryByPaging" resultMap="categoryBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from category order by CATEGORY_NO DESC) sub 
+			)
+		<!-- where rnum between #{from} and #{to}-->
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select>
+	
+	<select id="searchByCategoryName" resultMap="categoryBase" >
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from category where category_name like '%'||#{categoryName}||'%' order by CATEGORY_NO DESC) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to}
+		
+	</select>
+	
+	<insert id="insertCategory" parameterType="category">
+		insert into category
+		values(category_no_seq.NEXTVAL,#{categoryName})
+	</insert>
+	
+	
+	
+	
+	<resultMap type="category" id="categoryBase">
+		<id column="category_no" property="categoryNo"/>
+		<result column="category_name" property="categoryName"/>
+		
+	</resultMap>
+
+</mapper>

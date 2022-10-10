@@ -1,0 +1,65 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.PromiseDao">
+	
+	<select id="getAllPromise" resultMap="promiseBase">
+		select *
+		from promise
+	</select>
+	
+	<select id="getMyPromiseByPromote" parameterType="int" resultMap="promiseBase">
+		select * 
+		from promise
+		where promoter = #{promoter}
+	</select>
+	
+	<select id="getMyPromiseByInvitee" parameterType="int" resultMap="promiseBase">
+		select *
+		from promise
+		where invitee = #{invitee}
+	</select>
+	<insert id="insertPromise" parameterType="promise">
+		insert into promise values(promise_no_seq.nextval, #{promiseTitle}, #{promoter}, #{invitee}, 
+													#{promiseDate}, #{promiseLatitude}, #{promiseLongitude}, #{promiseContent}, #{promiseStatus})
+	</insert>
+	<select id="getPromiseByProAndDate" resultMap="promiseBase">
+		select *
+		from promise
+		where promoter=#{promoter} and promise_date=#{promiseDate}
+	</select>
+	<update id="updatePromise" parameterType="promise">
+		update promise set promise_title = #{promiseTitle}, promise_date =#{promiseDate},
+								 promise_latitude = #{promiseLatitude}, promise_longitude = #{promiseLongitude},
+								 promise_content = #{promiseContent}, promise_status = #{promiseStatus}
+		where promise_id=#{promiseId}
+	</update>
+	<delete id="deletePromise" parameterType="int">
+		delete promise where promise_id=#{promiseId}
+	</delete>
+	
+	<select id="selectStatus" parameterType="int" resultMap="promiseBase">
+		select *
+		from promise
+		where promise_id=#{promiseId}
+	</select>
+	
+	<update id="updateStatus">
+		update promise set promise_status = #{promiseStatus} where promise_id = #{promiseId}
+	</update>
+	
+	
+	<resultMap type="promise" id="promiseBase">
+		<id column="promise_id" property="promiseId"/>
+		<result column="promise_title" property="promiseTitle"/>
+		<result column="promoter" property="promoter"/>
+		<result column="invitee" property="invitee"/>
+		<result column="promise_date" property="promiseDate"/>
+		<result column="promise_latitude" property="promiseLatitude"/>
+		<result column="promise_longitude" property="promiseLongitude"/>
+		<result column="promise_content" property="promiseContent"/>
+		<result column="promise_status" property="promiseStatus"/>
+	</resultMap>
+
+</mapper>

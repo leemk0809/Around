@@ -1,0 +1,37 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.UserLocationDao">
+	<select id="selectUserLocation" resultMap="userLocationBase" parameterType="int">
+		select *
+		from user_location
+		where user_no=#{userNo}
+	</select>
+	<select id="selectUserLocationOne" resultMap="userLocationBase" parameterType="String">
+		select *
+		from user_location
+		where location_name=#{locationName}
+	</select>
+	<insert id="insertUserLocation" parameterType="userLocation">
+		insert into user_location
+		values(user_location_no_seq.nextval, #{locationName}, sysdate,#{latitude}, #{longitude}, #{userNo})
+	</insert>
+	<delete id="deleteUserLocation" parameterType="int">
+		delete user_location where user_location_no=#{userLocationNo}	
+	</delete>
+	<select id="userAllLocation" parameterType="int" resultType="UserLocation" >
+		select user_location_no as userLocationNo, location_name as locationName, user_no as UserNo, latitude, longitude from user_location
+		where user_no=#{userNo}
+	</select>
+	
+	<resultMap type="userLocation" id="userLocationBase">
+		<id column="user_location_no" property="userLocationNo"/>
+		<result column="location_name" property="locationName"/>
+		<result column="register_date" property="registerDate"/>
+		<result column="user_no" property="userNo"/>
+		<result column="latitude" property="latitude"/>
+		<result column="longitude" property="longitude"/>
+	</resultMap>
+
+</mapper>

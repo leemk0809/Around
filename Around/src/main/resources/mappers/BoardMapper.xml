@@ -1,0 +1,239 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.BoardDao">
+	
+	<select id="selectForBoardNo" resultMap="boardBase">
+		select *
+		from board
+		where user_no =#{userNo} and title=#{title}
+	
+	</select>
+	
+	
+	<select id="selectAllBoard" resultMap="boardBase">
+		select *
+		from board
+	</select>
+	
+	<select id="selectAllBoardByPaging" resultMap="boardBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board
+                  order by WRITED_DATE DESC) sub 
+			)
+		<!-- where rnum between #{from} and #{to}-->
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select>
+	
+	<select id="selectAllBoardByPagingMyFd" resultMap="boardBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board 
+						where (user_no in(
+                					select USER_FRIEND.FRIEND_NO 
+                					From USER_FRIEND 
+                					WHERE USER_FRIEND.USER_NO = #{userNo}
+                					) 
+                					and VIEW_STATUS = 'visible') 
+                			or(board_no in (select BOARD_NO from USER_HISTORY) and VIEW_STATUS = 'hidden' ) 
+                			or user_no =#{userNo}
+                	order by CATEGORY_NO, WRITED_DATE DESC					
+					) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select>
+	
+	<!-- <select id="test">
+		select * 
+		from (select rownum rnum, sub.*
+				from (SELECT * FROM BOARD 
+						where USER_NO in (select USER_FRIEND.FRIEND_NO 
+                  							From USER_FRIEND 
+                  							WHERE USER_FRIEND.USER_NO = #{userNo}) 
+						order by WRITED_DATE DESC
+						
+					
+					) sub 
+			)
+		where rnum between #{from} and #{to}
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	
+	
+	</select> -->
+	
+	
+	<select id="selectBoard" resultMap="boardBase" parameterType="int">
+		select *
+		from board
+		where board_no=#{boardNo}	
+	</select>
+	<select id="selectMyBoard" resultMap="boardBase" parameterType="int">
+		select *
+		from board
+		where user_no=#{userNo}		
+	</select>
+	<select id="selectMyBoardByPaging" resultMap="boardBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board where user_no=#{userNo} order by WRITED_DATE DESC) sub 
+			)
+		<!-- where rnum between #{from} and #{to}-->
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select>
+	
+	<delete id="deleteBoardByBoardNo" parameterType="int">
+		delete board where board_no = #{boardNo}
+	</delete>
+	
+	<update id="updateBoard" parameterType="board">
+		update board set title = #{title}, content =#{content}, category_no = #{categoryNo},image_path = #{imagePath}
+		where board_no=#{boardNo}	
+	</update>
+	
+	<insert id="insertBoard" parameterType="board">
+		insert into BOARD
+		VALUES(board_no_seq.NEXTVAL,#{title},1,#{content},sysdate,#{userNo},#{categoryNo},#{imagePath},#{viewStatus},#{targetDate})
+	</insert>
+	
+	<!-- <select id="selectMyCategoryBoardByPaging1" resultMap="boardBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board where user_no=#{userNo} and category_no = #{categoryNo} order by WRITED_DATE DESC) sub 
+			)
+		where rnum between #{from} and #{to}
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select> -->
+	
+	
+	<select id="selectMyCategoryBoardByPaging" resultMap="boardBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board 
+						where ((user_no in(
+                					select USER_FRIEND.FRIEND_NO 
+                					From USER_FRIEND 
+                					WHERE USER_FRIEND.USER_NO = #{userNo}
+                					) 
+                					and VIEW_STATUS = 'visible') 
+                			or(board_no in (select BOARD_NO from USER_HISTORY where board_no in(select BOARD_NO from board where VIEW_STATUS = 'hidden'))))
+                			and  category_no = #{categoryNo}
+                			
+                	order by WRITED_DATE DESC					
+					) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select>
+	<!-- <select id="selectMyCategoryBoardByPaging" resultMap="boardBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board 
+						where ((user_no in(
+                					select USER_FRIEND.FRIEND_NO 
+                					From USER_FRIEND 
+                					WHERE USER_FRIEND.USER_NO = #{userNo}
+                					) 
+                					and VIEW_STATUS = 'visible') 
+                			or(board_no in (select BOARD_NO from USER_HISTORY) and VIEW_STATUS = 'hidden' ))
+                			and  category_no = #{categoryNo}
+                			
+                	order by WRITED_DATE DESC					
+					) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select> -->
+	
+	
+	
+	
+	<!-- <select id="searchByTitleContent1" resultMap="boardBase" >
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board where title like '%'||#{title}||'%' or content like '%'||#{content}||'%' order by WRITED_DATE DESC) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to}
+		
+	</select> -->
+	<select id="searchByTitleContent" resultMap="boardBase" >
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board 
+						where ((user_no in(
+                					select USER_FRIEND.FRIEND_NO 
+                					From USER_FRIEND 
+                					WHERE USER_FRIEND.USER_NO = #{userNo}
+                					) 
+                					and VIEW_STATUS = 'visible') 
+                			or(board_no in (select BOARD_NO from USER_HISTORY) and VIEW_STATUS = 'hidden' ))
+                			and (title like '%'||#{title}||'%' or content like '%'||#{content}||'%')
+                			
+                	order by WRITED_DATE DESC					
+					) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+		
+	</select>
+	
+	
+	
+	
+	
+	
+	<!-- <select id="searchByTitleContentCategory" resultMap="boardBase" >
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board where title like '%'||#{title}||'%' or content like '%'||#{content}||'%' and category_no = #{categoryNo} order by WRITED_DATE DESC) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to}
+		
+	</select> -->
+	<select id="searchByTitleContentCategory" resultMap="boardBase" >
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from board 
+						where ((user_no in(
+                					select USER_FRIEND.FRIEND_NO 
+                					From USER_FRIEND 
+                					WHERE USER_FRIEND.USER_NO = #{userNo}
+                					) 
+                					and VIEW_STATUS = 'visible') 
+                			or(board_no in (select BOARD_NO from USER_HISTORY) and VIEW_STATUS = 'hidden' ))
+                			and (title like '%'||#{title}||'%' or content like '%'||#{content}||'%')
+                			and category_no = #{categoryNo}
+                	order by WRITED_DATE DESC					
+					) sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to}
+		
+	</select>
+		
+	<select id="slowBoard" resultMap="slowBoard" parameterType="hashmap">
+		select b.board_no, title, hit, content, writed_date, user_no, category_no, image_path, view_status, target_date
+		from board b join board_location l
+		on b.board_no = l.board_no
+		where (target_date between sysdate - 120/(24*60) and sysdate + 120/(24*60)) 
+		and (latitude between #{latitude} - #{range} and #{latitude} + #{range}) 
+		and (longitude between #{longitude} - #{range} and #{longitude} + #{range})
+	</select>
+	
+	
+	<resultMap type="board" id="boardBase">
+		<id column="board_no" property="boardNo"/>
+		<result column="title" property="title"/>
+		<result column="hit" property="hit"/>
+		<result column="content" property="content"/>
+		<result column="writed_date" property="writedDate"/>
+		<result column="user_no" property="userNo"/>
+		<result column="category_no" property="categoryNo"/>
+		<result column="image_path" property="imagePath"/>
+		<result column="view_status" property="viewStatus"/>
+		<result column="target_date" property="targetDate"/>
+	</resultMap>
+	
+	<resultMap type="board" id="slowBoard" extends="boardBase">
+		<collection property="boardLocationsSet" ofType="boardLocation" 
+						  resultMap="BoardLocationMapper.boardLocationBase"></collection>
+	</resultMap>
+
+</mapper>

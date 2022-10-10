@@ -1,0 +1,26 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.ReplyDao">
+	
+	<select id="selectReplyByBoardNo" resultMap="replyBase" parameterType="int">
+		select *
+		from REPLY
+		where BOARD_NO=#{boardNo}		
+	</select>		
+	
+	<insert id="insertReply">
+		insert into reply values(reply_no_seq.nextval,#{boardNo},#{userNo},#{replyContets},sysdate)
+	</insert>
+	
+	
+	<resultMap type="reply" id="replyBase">
+		<id column="reply_no" property="replyNo"/>
+		<result column="board_no" property="boardNo"/>
+		<result column="user_no" property="userNo"/>
+		<result column="reply_contents" property="replyContets"/>
+		<result column="reply_date" property="replyDate"/>		
+	</resultMap>
+
+</mapper>

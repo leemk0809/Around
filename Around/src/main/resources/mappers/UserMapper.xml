@@ -1,0 +1,118 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.UserDao">
+	<select id="selectUser" resultMap="usersBase" parameterType="String">
+		select user_no, user_id, password, nickname, user_name, tel, email, birthdate
+		from users
+		where user_id=#{userId}
+	</select>
+	<select id="selectUserByNickname" resultMap="usersBase" parameterType="String">
+		select user_no, user_id, password, nickname, user_name, tel, email, birthdate, profile_path
+		from users
+		where nickname=#{nickname}
+	</select>
+	
+	<select id="selectAllUser" resultMap="usersBase">
+		select *
+		from users
+	</select>
+	
+	<select id="selectNotFriends" resultMap="usersBase" parameterType="int">	
+	select * 
+	from users 
+	where (USER_NO not in(select USER_FRIEND.FRIEND_NO 
+						from USER_FRIEND 
+						where USER_NO = #{userNo}))and user_no !=#{userNo}
+	
+	</select>
+	<select id="selectIfYouKnow" resultMap="usersBase" parameterType="int">
+		select * 
+		from (select * 
+				from users 
+				where user_no in(select USER_FRIEND.USER_NO 
+									from USER_FRIEND 
+									where FRIEND_NO =#{userNo}))
+		where user_no not in (select FRIEND_NO 
+								from USER_FRIEND 
+								where USER_NO=#{userNo})
+	</select>
+	
+	
+	
+	
+	<insert id="insertUser" parameterType="user">
+		insert into users(user_no, user_id, password, nickname, user_name, tel, email, birthdate,profile_path)
+		values(user_no_seq.nextval, #{userId}, #{password},#{nickname},#{userName},#{tel},#{email},#{birthdate},#{profilePath})
+	</insert>
+	
+	<select id="searchId" parameterType="String" resultMap="usersBase">
+		select *
+		from users
+		where user_name = #{name} and email = #{email}
+	</select>
+	
+	<select id="searchPw" parameterType="map" resultMap="usersBase">
+		select *
+		from users
+		where user_id = #{id} and user_name = #{name} and email = #{email}
+	</select>
+	
+	<delete id="deleteUser" parameterType="int">
+		delete users where user_no = #{userNo}
+	</delete>
+	
+	
+	<select id="sselectAllUserByPaging" resultMap="usersBase">
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from users) sub 
+			)
+		<!-- where rnum between #{from} and #{to}-->
+		where rnum &gt;= #{from} and rnum &lt;= #{to} 
+	</select>
+	
+	
+	<select id="searchByNickNameUserNameUsers" resultMap="usersBase" >
+		select * 
+		from (select rownum rnum, sub.*
+				from (select * from users where nickname like '%'||#{nickname}||'%' or user_name like '%'||#{userName}||'%') sub 
+			)		
+		where rnum &gt;= #{from} and rnum &lt;= #{to}
+		
+	</select>
+	
+	<select id="selectUserProfilePathByUserNo" resultMap="usersBase" parameterType="int">
+		select *
+		from users
+		where user_no = #{userNo}
+	</select>
+	
+	<select id="searchUserByUserNo" parameterType="int" resultMap="usersBase">
+		select * 
+		from users
+		where user_no = #{userNo}
+	</select>
+	
+	<select id = "selectUserFriends" parameterType="int" resultMap="usersBase">
+		select user_no,user_name
+		from users
+		where user_no in (select FRIEND_NO from USER_FRIEND where user_no = #{userNo})
+	</select>
+	
+	
+	
+	<resultMap type="user" id="usersBase">
+		<id column="user_no" property="userNo"/>
+		<result column="user_id" property="userId"/>
+		<result column="password" property="password"/>
+		<result column="nickname" property="nickname"/>
+		<result column="user_name" property="userName"/>
+		<result column="tel" property="tel"/>
+		<result column="email" property="email"/>
+		<result column="birthdate" property="birthdate"/>
+		<result column="profile_path" property="profilePath"/>
+	</resultMap>
+
+</mapper>

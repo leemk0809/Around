@@ -1,0 +1,44 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="net.around.dao.BoardLocationDao">
+	<select id="selectBoardLocation" resultMap="boardLocationBase" parameterType="int">
+		select *
+		from BOARD_LOCATION
+		where board_no=#{boardNo}		
+	</select>		
+		
+	
+	<insert id="insertBoardLocation" parameterType="boardLocation">
+		insert into BOARD_LOCATION
+		VALUES(board_location_no_seq.NEXTVAL,#{latitude},#{longitude},#{boardNo})
+	</insert>
+	
+	<select id="selectBoardLocationByUserId" resultMap="boardLocationBase"  parameterType="int">
+		select *
+		from board_location
+		where board_no=all(select board_no
+               							 from board
+              							 where user_no= all( select friend_no
+                               											  from user_friend
+                               											  where user_no=#{userNo}))
+	</select>
+	
+	<select id="getBoardsBycenterLocation" parameterType="map" resultMap="boardLocationBase">
+		select *
+		from board_location
+		where (latitude between #{centerLat} - #{range} and #{centerLat} + #{range})
+		and (longitude between #{centerLng} - #{range} and #{centerLng} + #{range})
+	</select>
+	
+	
+	
+	<resultMap type="boardLocation" id="boardLocationBase">
+		<id column="board_location_no" property="boardLocationNo"/>
+		<result column="latitude" property="latitude"/>
+		<result column="longitude" property="longitude"/>
+		<result column="board_no" property="boardNo"/>		
+	</resultMap>
+
+</mapper>

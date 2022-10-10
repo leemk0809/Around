@@ -1,0 +1,220 @@
+create TABLE admin(
+admin_id varchar2(20) not null,
+password varchar2(20) not null, 
+constraint admin_id_pk primary key (admin_id)
+);
+
+create table users(
+user_no number not null,
+user_id varchar2(20) not null,
+password varchar2(20) not null,
+nickname varchar2(20) not null,
+user_name varchar2(20) not null,
+tel varchar2(20),
+email varchar2(30),
+birthdate date,
+constraint user_no_pk primary key (user_no),
+constraint user_id_u unique (user_id),
+constraint user_nickname_u unique (nickname)
+);
+
+create sequence user_no_seq
+start with 1 increment by 1;
+
+create table user_location(
+  user_location_no number not null,
+  location_name varchar2(20) not null,
+  register_date date not null,
+  latitude float not null,
+  longitude float not null,
+  user_no number not null,
+  constraint user_location_no_pk primary key (user_location_no)
+);
+
+alter table user_location add constraint user_no_fk 
+foreign key (user_no) references users (user_no) on delete cascade;
+
+create sequence user_location_no_seq
+start with 1 increment by 1;
+
+create table user_friend(
+  list_no number not null,
+  friend_no number not null,
+  statue varchar2(20) not null,
+  user_no number not null,
+  constraint list_no_pk primary key(list_no)
+);
+
+create sequence friend_list_no_seq
+start with 1 increment by 1;
+
+alter table user_friend add constraint user_no_fk2
+foreign key (user_no) references users (user_no) on delete cascade;
+
+create table category(
+  category_no number not null,
+  category_name varchar2(20) not null,
+  constraint category_no_pk primary key (category_no)
+);
+
+create sequence category_no_seq
+start with 1 increment by 1;
+
+create table board(
+  board_no number not null,
+  title varchar2(20) not null,
+  hit number,
+  content varchar2(500),
+  writed_date date not null,
+  user_no number not null,
+  category_no number not null,
+  constraint board_no_pk primary key (board_no)
+);
+
+alter table board add constraint user_no_fk3 foreign key (user_no) references users (user_no)on delete cascade;
+alter table board add constraint category_no_fk foreign key (category_no) references category (category_no);
+
+create sequence board_no_seq
+start with 1 increment by 1;
+
+create table board_location(
+  board_location_no number not null,
+  latitude float not null,
+  longitude float not null,
+  board_no number not null,
+  constraint board_location_no_pk primary key (board_location_no)
+);
+
+alter table board_location add constraint board_no_fk 
+foreign key (board_no) references board(board_no) on delete cascade;
+
+create sequence board_location_no_seq
+start with 1 increment by 1;
+
+create table user_category(
+  list_no number not null,
+  category_no number not null,
+  user_no number not null
+);
+
+alter table user_category add constraint category_no_fk2 foreign key (category_no) references category(category_no);
+alter table user_category add constraint user_no_fk4 
+foreign key (user_no) references users (user_no) on delete cascade;
+
+create sequence category_list_no_seq
+start with 1 increment by 1;
+
+
+
+
+alter table board add(image_path varchar2(20));
+
+alter table board_location
+drop constraint board_no_fk;
+
+alter table board_location
+add constraint board_no_fk foreign key(board_no) references board(board_no);
+
+alter table user_friend add alarm varchar2(20) check(alarm in('on','off'));
+alter table user_friend modify alarm constraint alarm_nn not null;
+
+
+
+create table promise(
+  promise_id number not null,
+  promise_title varchar2(50) not null,
+  promoter number not null,
+  invitee number not null,
+  promise_date date,
+  promise_latitude float not null,
+  promise_longitude float not null,
+  promise_content varchar2(200),
+  promise_status varchar2(20) not null,
+  constraint promise_id_pk primary key (promise_id)
+);
+
+create sequence promise_no_seq
+start with 1 increment by 1;
+
+alter table board add view_status varchar(20) check(view_status in('hidden','visible'));
+update board set VIEW_STATUS='visible';
+alter table board modify view_status constraint view_status not null;
+
+create table user_history(
+  user_no number not null,
+  board_no number not null,
+  foreign key(user_no) REFERENCES users(user_no) on DELETE CASCADE,
+  foreign key(board_no) REFERENCES board(board_no) on DELETE CASCADE
+);
+
+alter table board MODIFY (image_path varchar2(200));
+alter table users add profile_path varchar(200);
+
+alter table board add target_date date;
+
+
+create table reply(
+  reply_no number not null,
+  board_no number not null,
+  user_no number not null,
+  reply_contents varchar2(200),
+  reply_date date,
+  constraint reply_no_pk primary key (reply_no)
+);
+
+create sequence reply_no_seq
+start with 1 increment by 1;
+
+
+
+create table hot_board(
+  hot_board_no number not null,
+  category_no number,
+  title varchar2(30),
+  contents varchar2(200),
+  file_path varchar2(200),
+  CONSTRAINT hot_board_no_pk PRIMARY KEY (hot_board_no)
+);
+create sequence hot_board_no_seq
+start with 1 increment by 1;
+
+insert into users(USER_NO,USER_ID,PASSWORD,NICKNAME,USER_NAME,TEL,EMAIL,BIRTHDATE)
+VALUES(USER_NO_SEQ.NEXTVAL,'hong','1234','hhh','kildong','010-4137-9919','eungoo1241@naver.com',sysdate);
+insert into users(USER_NO,USER_ID,PASSWORD,NICKNAME,USER_NAME,TEL,EMAIL,BIRTHDATE)
+VALUES(USER_NO_SEQ.NEXTVAL,'lee','1234','min','minkuk','010-4137-8888','minkuk@naver.com',sysdate);
+insert into users(USER_NO,USER_ID,PASSWORD,NICKNAME,USER_NAME,TEL,EMAIL,BIRTHDATE)
+VALUES(USER_NO_SEQ.NEXTVAL,'ba','1234','nam','namy','010-7898-8888','kkk@naver.com',sysdate);
+
+
+insert into USER_LOCATION VALUES(user_location_no_seq.NEXTVAL,'location1',sysdate,36.815129,127.11389389,2);
+insert into USER_LOCATION VALUES(user_location_no_seq.NEXTVAL,'location2',sysdate,36.855139,127.21389389,3);
+
+
+insert into category VALUES(category_no_seq.NEXTVAL,'computer');
+insert into category VALUES(category_no_seq.NEXTVAL,'study');
+insert into category VALUES(category_no_seq.NEXTVAL,'food');
+
+insert into BOARD VALUES(board_no_seq.NEXTVAL,'sample data',1,'this is sparta',sysdate,2,1,'');
+insert into BOARD VALUES(board_no_seq.NEXTVAL,'sample data2',1,'this is sparta',sysdate,2,1,'');
+insert into BOARD VALUES(board_no_seq.NEXTVAL,'sample data3',1,'this is sparta',sysdate,2,1,'');
+
+insert into BOARD_LOCATION VALUES(board_location_no_seq.nextval,36.115129,127.91389389,1);
+
+insert into USER_CATEGORY VALUES(1,1,2);
+
+insert into user_friend values(friend_list_no_seq.nextval, 2, 'sleep', 2, 'on');
+insert into user_friend values(friend_list_no_seq.nextval, 3, 'work', 2, 'off');
+insert into user_friend values(friend_list_no_seq.nextval, 1, 'cycle', 2, 'off');
+
+insert into promise
+values(promise_no_seq.NEXTVAL, '서산에서밥먹자', 108, 3, sysdate, 36.804969,126.435979, '빨리빨리111', '약속 완료');
+
+insert into promise
+values(promise_no_seq.NEXTVAL, '보령에서밥먹자', 108, 3, sysdate,36.349064, 126.594654, '빨리빨리222', '약속 중');
+
+insert into promise
+values(promise_no_seq.NEXTVAL, '전주에서밥먹자', 2, 108, sysdate, 35.846524, 127.134912, '빨리빨리333', '약속 중');
+
+insert into promise
+values(promise_no_seq.NEXTVAL, '부산에서밥먹자', 2, 108, sysdate,35.159941,129.049699, '빨리빨리444', '약속 완료');
+
