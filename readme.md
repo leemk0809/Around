@@ -1,6 +1,4 @@
-＃Around
-
-タイトル：Around
+#タイトル：Around
 
 ![image](https://user-images.githubusercontent.com/21729665/194884670-f1be7bb1-c43f-4061-b25b-909606fb6c21.png)
 
